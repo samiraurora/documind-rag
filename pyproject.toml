@@ -1,0 +1,51 @@
+[project]
+name = "documind-rag"
+version = "0.1.0"
+description = "Document question answering with RAG"
+readme = "README.md"
+authors = [
+    { name = "SAMIR KAHAR", email = "samir.aurora30@gmail.com" }
+]
+requires-python = ">=3.12, <3.14"
+dependencies = [
+    "fastapi>=0.161.1",
+    "pydantic-settings>=2.16.1",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[project.scripts]
+documind-rag = "documind_rag:main"
+
+[build-system]
+requires = ["uv_build>=0.11.7,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.1.1",
+    "ruff>=0.17.2",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+src = ["src"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # Pyflakes
+    "I",    # Import sorting
+    "UP",   # Python upgrade rules
+    "B",    # Bugbear checks
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
