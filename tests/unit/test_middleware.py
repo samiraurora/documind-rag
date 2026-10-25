@@ -34,3 +34,28 @@ def test_not_found_response_includes_correlation_id() -> None:
 
     assert response.status_code == 404
     assert "X-Request-ID" in response.headers
+
+
+def test_non_health_request_logs_structured_fields(caplog) -> None:
+    import logging
+
+    with caplog.at_level(
+        logging.INFO,
+        logger="documind_rag.core.middleware",
+    ):
+        response = client.get("/docs")
+
+    assert response.status_code == 200
+
+    log_record = next(
+        record
+        for record in caplog.records
+        if record.name == "documind_rag.core.middleware"
+        and record.getMessage() == "HTTP request completed"
+    )
+
+    assert log_record.request_id == response.headers["X-Request-ID"]
+    assert log_record.method == "GET"
+    assert log_record.path == "/docs"
+    assert log_record.status_code == 200
+    assert log_record.duration_ms >= 0
