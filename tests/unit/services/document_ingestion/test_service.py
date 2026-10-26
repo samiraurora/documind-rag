@@ -1,9 +1,18 @@
+import pymupdf
 import pytest
 
 from documind_rag.services.document_ingestion.service import (
     DocumentIngestionService,
     UnsupportedDocumentFormatError,
 )
+
+
+def create_pdf(text: str) -> bytes:
+    """Create a single-page PDF containing the supplied text."""
+    with pymupdf.open() as document:
+        page = document.new_page()
+        page.insert_text((72, 72), text)
+        return document.tobytes()
 
 
 def test_extracts_text_file() -> None:
@@ -17,6 +26,21 @@ def test_extracts_text_file() -> None:
     assert result.filename == "notes.txt"
     assert result.source_format == "txt"
     assert result.text == "Hello from a text file."
+
+
+def test_extracts_pdf_file() -> None:
+    service = DocumentIngestionService()
+
+    result = service.extract(
+        create_pdf("Hello from a PDF file."),
+        filename="report.pdf",
+    )
+
+    assert result.filename == "report.pdf"
+    assert result.source_format == "pdf"
+    assert len(result.pages) == 1
+    assert result.pages[0].page_number == 1
+    assert "Hello from a PDF file." in result.text
 
 
 def test_rejects_unsupported_format() -> None:
