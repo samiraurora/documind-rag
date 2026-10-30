@@ -1,5 +1,8 @@
 import pymupdf
 
+from documind_rag.services.document_ingestion.exceptions import (
+    PdfExtractionError,
+)
 from documind_rag.services.document_ingestion.models import (
     ExtractedDocument,
     ExtractedPage,
@@ -16,20 +19,25 @@ class PdfExtractor:
         filename: str,
     ) -> ExtractedDocument:
         """Extract text from each PDF page."""
-        with pymupdf.open(
-            stream=content,
-            filetype="pdf",
-        ) as document:
-            pages = tuple(
-                ExtractedPage(
-                    page_number=page_number,
-                    text=page.get_text("text"),
+        try:
+            with pymupdf.open(
+                stream=content,
+                filetype="pdf",
+            ) as document:
+                pages = tuple(
+                    ExtractedPage(
+                        page_number=page_number,
+                        text=page.get_text("text"),
+                    )
+                    for page_number, page in enumerate(
+                        document,
+                        start=1,
+                    )
                 )
-                for page_number, page in enumerate(
-                    document,
-                    start=1,
-                )
-            )
+        except pymupdf.FileDataError as exc:
+            raise PdfExtractionError(
+                "The uploaded PDF is invalid or cannot be opened."
+            ) from exc
 
         return ExtractedDocument(
             filename=filename,

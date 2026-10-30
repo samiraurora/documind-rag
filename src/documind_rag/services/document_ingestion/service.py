@@ -1,5 +1,8 @@
 from pathlib import PurePath
 
+from documind_rag.services.document_ingestion.exceptions import (
+    UnsupportedDocumentFormatError,
+)
 from documind_rag.services.document_ingestion.extractors.pdf_extractor import (
     PdfExtractor,
 )
@@ -9,10 +12,6 @@ from documind_rag.services.document_ingestion.extractors.text_extractor import (
 from documind_rag.services.document_ingestion.models import (
     ExtractedDocument,
 )
-
-
-class UnsupportedDocumentFormatError(ValueError):
-    """Raised when a document format is not supported."""
 
 
 class DocumentIngestionService:

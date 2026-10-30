@@ -1,5 +1,8 @@
 import pytest
 
+from documind_rag.services.document_ingestion.exceptions import (
+    TextExtractionError,
+)
 from documind_rag.services.document_ingestion.extractors.text_extractor import (
     TextExtractor,
 )
@@ -54,10 +57,13 @@ def test_extracts_empty_file() -> None:
     assert len(result.pages) == 1
 
 
-def test_invalid_utf8_raises_error() -> None:
+def test_extract_invalid_utf8() -> None:
     extractor = TextExtractor()
 
-    with pytest.raises(UnicodeDecodeError):
+    with pytest.raises(
+        TextExtractionError,
+        match="valid UTF-8",
+    ):
         extractor.extract(
             b"\xff\xfe\xfa",
             filename="invalid.txt",

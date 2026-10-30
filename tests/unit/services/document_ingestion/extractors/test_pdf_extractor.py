@@ -1,5 +1,9 @@
 import pymupdf
+import pytest
 
+from documind_rag.services.document_ingestion.exceptions import (
+    PdfExtractionError,
+)
 from documind_rag.services.document_ingestion.extractors.pdf_extractor import (
     PdfExtractor,
 )
@@ -68,3 +72,16 @@ def test_extracts_blank_pdf_page() -> None:
     assert result.pages[0].page_number == 1
     assert result.pages[0].text == ""
     assert result.text == ""
+
+
+def test_extract_invalid_pdf() -> None:
+    extractor = PdfExtractor()
+
+    with pytest.raises(
+        PdfExtractionError,
+        match="invalid or cannot be opened",
+    ):
+        extractor.extract(
+            b"This is not a PDF",
+            filename="invalid.pdf",
+        )

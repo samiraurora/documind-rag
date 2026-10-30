@@ -1,9 +1,11 @@
 import pymupdf
 import pytest
 
+from documind_rag.services.document_ingestion.exceptions import (
+    UnsupportedDocumentFormatError,
+)
 from documind_rag.services.document_ingestion.service import (
     DocumentIngestionService,
-    UnsupportedDocumentFormatError,
 )
 
 
